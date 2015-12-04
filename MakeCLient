@@ -1,0 +1,7 @@
+all: compile
+
+compile:
+	gcc -o netclient netclient.c
+
+clean:
+	rm netclient
