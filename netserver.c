@@ -14,6 +14,8 @@
 
 int main()
 {
+    FILE * f;
+    FILE * o;
     int len;
     int sock, listener;
     struct sockaddr_in addr;
@@ -28,6 +30,14 @@ int main()
         exit(1);
     }
     
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(3425);
+    addr.sin_addr.s_addr = INADDR_ANY;
+    if(bind(listener, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    {
+        perror("bind");
+        exit(2);
+    }
 
     listen(listener, 1);
     
@@ -51,9 +61,24 @@ int main()
             while(1)
             {
                 bytes_read = recv(sock, buffer, 1024, 0);
-                
+                if(bytes_read <= 0) break;
+                const char *b=buffer;
+                f = popen(b, "r");
+                if (f == NULL)
+                {
+                    perror("ошибка:\n");
+                    return -1;
+                }
+                o = fopen("log.txt", "w");
+                while ((len = fread(buf, 1, 1024, f)) != 0)
+                {
+                     
+                     fwrite(buf, 1, len, o);
+                }
                 
                 send(sock, buf, 1024, 0);
+                pclose(f);
+                fclose(o);
                 close(sock);
                 _exit(0);
             }

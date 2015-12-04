@@ -29,7 +29,14 @@ int main(int argc, char** argv)
     addr.sin_family = AF_INET;
     addr.sin_port = htons(3425); // или любой другой порт...
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-
+    if (inet_addr(argv[1], &addr.sin_addr.s_addr) == 0) 
+    {
+        puts("IP addres error");
+	return 1;	
+    }
+    scanf("%s", message);
+    do
+    {
         sock = socket(AF_INET, SOCK_STREAM, 0);
         if(sock < 0)
         {
@@ -47,7 +54,9 @@ int main(int argc, char** argv)
         recv(sock, buf, 1024, 0);
     
         printf("%s", buf);
-        close(sock);
+        close(sock); 
+        scanf("%s", message);
+    } while (message[0]!='q')
 
     return 0;
 }
